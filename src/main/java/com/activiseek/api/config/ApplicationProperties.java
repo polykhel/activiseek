@@ -11,4 +11,31 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "application", ignoreUnknownFields = false)
 public class ApplicationProperties {
 
+    final private YelpApi yelpApi = new YelpApi();
+
+    public YelpApi getYelpApi() {
+        return yelpApi;
+    }
+
+    public class YelpApi {
+        private String apiKey;
+        private String basePath;
+
+        public String getApiKey() {
+            return apiKey;
+        }
+
+        public void setApiKey(String apiKey) {
+            this.apiKey = apiKey;
+        }
+
+        public String getBasePath() {
+            return basePath;
+        }
+
+        public void setBasePath(String basePath) {
+            this.basePath = basePath;
+        }
+    }
+
 }

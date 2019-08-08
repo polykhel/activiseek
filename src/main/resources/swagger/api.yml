@@ -2,21 +2,641 @@
 # This file will be used at compile time to generate Spring-MVC endpoint stubs using openapi-generator
 openapi: '3.0.1'
 info:
-  title: 'activiseek'
-  version: 0.0.1
+  description: |
+    Activiseek API
+  version: "0.0.1"
+  title: Activiseek API
+  termsOfService: 'http://localhost:8191/terms/'
+  contact:
+    name: Michael Pollente
+    email: pollentem@gmail.com
+
 servers:
-  - url: http://localhost:8080
+  - url: http://localhost:8191
     description: Development server
-  - url: https://localhost:8080
+  - url: https://localhost:8191
     description: Development server with TLS Profile
-paths: {}
+
+tags:
+  - name: activities
+    description: List of cards picked for the session
+  - name: feed
+    description: List of cards to suggest
+  - name: card
+    description: Everything about your cards
+  - name: user
+    description: Operations about user
+    externalDocs:
+      description: Find out more about our store
+      url: 'http://localhost:8191'
 
 components:
+  schemas:
+    Card:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        business:
+          $ref: '#/components/schemas/Business'
+
+    Business:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+          description: Name of the business
+        url:
+          type: string
+          description: Yelp URL of the business page
+        imageUrl:
+          type: string
+          description: URL of the photo for this business
+        location:
+          $ref: '#/components/schemas/BusinessLocation'
+        priceRange:
+          type: integer
+          description: Price bracket of the restaurant (1 being budget friendly and 4 being the most expensive)
+        userRating:
+          type: number
+          format: float
+          description: Rating for this business
+        reviewCount:
+          type: integer
+          description: Number of reviews for this business
+    BusinessLocation:
+      type: object
+      description: Restaurant location details
+      properties:
+        id:
+          type: integer
+          format: int64
+        latitude:
+          type: number
+          format: double
+          description: The latitude of the business
+        longitude:
+          type: number
+          format: double
+          description: The longitude of the business
+        address:
+          type: string
+          description: Street address of the business
+        city:
+          type: string
+          description: City of the business
+        state:
+          type: string
+          description: State or province of the business
+        zipcode:
+          type: string
+          description: Zip code of the business
+        country:
+          type: string
+          description: Country code of the business
+    BusinessDetails:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+          description: Name of the business
+        url:
+          type: string
+          description: Yelp URL of the business page
+        imageUrl:
+          type: string
+          description: URL of the photo for the business
+        location:
+          $ref: '#/components/schemas/BusinessLocation'
+        phone:
+          type: string
+          description: Phone number of the business
+        reviewCount:
+          type: integer
+          description: Number of reviews for this business
+        priceRange:
+          type: integer
+          description: Price bracket of the restaurant (1 being budget friendly and 4 being the most expensive)
+        hasOnlineDelivery:
+          type: boolean
+          default: false
+        hasPickupService:
+          type: boolean
+          default: false
+        hasTableBooking:
+          type: boolean
+          default: false
+        hours:
+          $ref: '#/components/schemas/BusinessHours'
+        categories:
+          type: array
+          items:
+            type: string
+          description: A list of category of the business
+        photos:
+          type: array
+          items:
+            type: string
+          description: URLs of the photos of the business
+    BusinessReviews:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+          rating:
+            type: number
+            format: float
+            description: Rating of the review
+          reviewText:
+            type: string
+            description: Text excerpt of the review
+          reviewTime:
+            type: string
+            description: The time that the review was created
+          url:
+            type: string
+            description: URL of the review
+          reviewer:
+            type: string
+            description: Name of the reviewer
+    BusinessHours:
+      type: object
+      properties:
+        open:
+          type: array
+          items:
+            type: object
+            properties:
+              day:
+                type: integer
+                description: From 0 to 6, representing day of the week from Monday to Sunday
+              start:
+                type: string
+                description: Start of the opening hours
+              end:
+                type: string
+                description: End of the opening hours
+        isOpenNow:
+          type: boolean
+          description: Whether the business is currently open or not
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        username:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        phone:
+          type: string
+        userStatus:
+          type: integer
+          format: int32
+          description: User Status
+        currentLocation:
+          type: string
+        currentCravings:
+          type: array
+          items:
+            type: string
+      xml:
+        name: User
+
+  requestBodies:
+    Card:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Card'
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/Card'
+      description: Card objects that needs to be added to the feed
+      required: true
+    UserArray:
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/User'
+      description: List of user object
+      required: true
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+      content:
+        application/json:
+          example:
+            { "message": "Authorization information is missing or invalid." }
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          example:
+            { "message": "Resource not found" }
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          example:
+            { "message": "Bad request" }
+
+  parameters:
+    cardId:
+      in: path
+      name: cardId
+      required: true
+      description: Id of the card
+      example: 123
+      schema:
+        type: string
+
   securitySchemes:
-    jwt:
+    jwt:            # arbitrary name for the security scheme
       type: http
       description: JWT Authentication
       scheme: bearer
-      bearerFormat: JWT
+      bearerFormat: JWT    # optional, arbitrary value for documentation purposes
+
 security:
-  - jwt: []
+  - jwt: []        # Apply the security globally to all operations
+
+paths:
+  /feed:
+    get:
+      tags:
+        - feed
+      summary: Refresh the feed
+      operationId: getFeed
+      responses:
+        '200':
+          description: Feed successfully retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Card'
+              example:
+                [{
+                   id: "0001",
+                   business: {
+                     id: "0001",
+                     name: "Mang Inasal",
+                     url: "https://www.yelp.com/biz/mang-inasal-makati?adjust_creative=J61ctkwXVl7xX3JLAk_Qsw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=J61ctkwXVl7xX3JLAk_Qsw",
+                     imageUrl: "https://www.yelp.com/biz/mang-inasal-makati?adjust_creative=J61ctkwXVl7xX3JLAk_Qsw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=J61ctkwXVl7xX3JLAk_Qsw",
+                     location: {
+                       latitude: 14.55283,
+                       longitude: 121.013718,
+                       address: "Makati Avenue",
+                       city: "Makati",
+                       state: "NCR",
+                       zipCode: "1111",
+                       country: "PH"
+                     },
+                     priceRange: 1,
+                     userRating: 4.5,
+                     reviewCount: 4
+                   }
+                 }]
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /activities:
+    post:
+      tags:
+        - activities
+      summary: Add card to the activities list
+      operationId: addCardToActivities
+      parameters:
+        - name: direction
+          in: query
+          description: The swipe direction
+          required: true
+          schema:
+            type: string
+          example: right
+      responses:
+        '200':
+          description: Card successfully added to activities
+          content:
+            application/json:
+              example:
+                { "message": "Card successfully added to activities" }
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      requestBody:
+        $ref: '#/components/requestBodies/Card'
+  '/activities/{cardId}':
+    parameters:
+      - in: path
+        name: cardId
+        required: true
+        description: Id of the card
+        schema:
+          type: string
+          example: 123
+    delete:
+      tags:
+        - activities
+      summary: Discard card from the activities list
+      operationId: deleteCardFromActivities
+      responses:
+        '200':
+          description: Card successfully deleted from activities list
+          content:
+            application/json:
+              example:
+                { "message": "Card successfully added to activities" }
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  '/activities/finish':
+    get:
+      tags:
+        - activities
+      summary: Finish session, get random card
+      operationId: getCardFromActivities
+      responses:
+        '200':
+          description: Card suggestion retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Card'
+              example:
+                {
+                  id: "0001",
+                  business: {
+                    id: "0001",
+                    name: "Mang Inasal",
+                    url: "https://www.yelp.com/biz/mang-inasal-makati?adjust_creative=J61ctkwXVl7xX3JLAk_Qsw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=J61ctkwXVl7xX3JLAk_Qsw",
+                    imageUrl: "https://www.yelp.com/biz/mang-inasal-makati?adjust_creative=J61ctkwXVl7xX3JLAk_Qsw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=J61ctkwXVl7xX3JLAk_Qsw",
+                    location: {
+                      latitude: 14.55283,
+                      longitude: 121.013718,
+                      address: "Makati Avenue",
+                      city: "Makati",
+                      state: "NCR",
+                      zipCode: "1111",
+                      country: "PH"
+                    },
+                    priceRange: 1,
+                    userRating: 4.5,
+                    reviewCount: 4
+                  }
+                }
+  '/card/{cardId}':
+    parameters:
+      - $ref: '#/components/parameters/cardId'
+    get:
+      tags:
+        - card
+      description: Get card details (!is_closed)
+      operationId: getCardBusinessDetails
+      responses:
+        '200':
+          description: Card details retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BusinessDetails'
+              example:
+                {
+                  id: "0001",
+                  name: "Mang Inasal",
+                  url: "https://www.yelp.com/biz/mang-inasal-makati?adjust_creative=J61ctkwXVl7xX3JLAk_Qsw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=J61ctkwXVl7xX3JLAk_Qsw",
+                  imageUrl: "https://www.yelp.com/biz/mang-inasal-makati?adjust_creative=J61ctkwXVl7xX3JLAk_Qsw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=J61ctkwXVl7xX3JLAk_Qsw",
+                  location: {
+                    latitude: "14.55283",
+                    longitude: "121.013718",
+                    address: "Makati Avenue",
+                    city: "Makati",
+                    state: "NCR",
+                    zipCode: "1111",
+                    country: "PH"
+                  },
+                  phone: "123-12345",
+                  reviewCount: 4,
+                  priceRange: 1,
+                  hasOnlineDelivery: false,
+                  hasPickupService: false,
+                  hasTableBooking: false,
+                  hours: {
+                    open: [
+                    { day: 0,
+                      start: 0800,
+                      end: 0200
+                    },
+                    { day: 1,
+                      start: 0800,
+                      end: 0200
+                    }],
+                    isOpenNow: true
+                  },
+                  categories: {
+                                "fast food"
+                  },
+                  photos: {
+                            "https://s3-media3.fl.yelpcdn.com/bphoto/LXMp1PBPGgYUmDusO23nMg/o.jpg",
+                            "https://s3-media1.fl.yelpcdn.com/bphoto/4fMMuOCbWtLh3oob5v65Eg/o.jpg",
+                            "https://s3-media4.fl.yelpcdn.com/bphoto/U8qZ0Uqk4s-sF2f5ZckkpQ/o.jpg"
+                  }
+                }
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  '/card/{cardId}/reviews':
+    parameters:
+      - $ref: '#/components/parameters/cardId'
+    get:
+      tags:
+        - card
+      description: Get reviews for the card
+      operationId: getCardBusinessReviews
+      responses:
+        '200':
+          description: Business reviews retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BusinessReviews'
+              example:
+                {
+                  id: "0001",
+                  rating: 5,
+                  reviewText: "This is my go to place in Manila",
+                  reviewTime: "2018-03-03 19:29:35",
+                  url: "https://www.yelp.com/biz/mang-inasal-makati?adjust_creative=J61ctkwXVl7xX3JLAk_Qsw&hrid=9zE8xVyo1rgoktfij38uqQ&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_reviews&utm_source=J61ctkwXVl7xX3JLAk_Qsw",
+                  reviewer: "Fernando S."
+                }
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /user:
+    post:
+      tags:
+        - user
+      summary: Create user
+      description: This can only be done by the logged in user.
+      operationId: createUser
+      responses:
+        default:
+          description: successful operation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        description: Created user object
+        required: true
+  /user/login:
+    get:
+      tags:
+        - user
+      summary: Logs user into the system
+      operationId: loginUser
+      parameters:
+        - name: username
+          in: query
+          description: The user name for login
+          required: true
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: The password for login in clear text
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          headers:
+            X-Rate-Limit:
+              description: calls per hour allowed by the user
+              schema:
+                type: integer
+                format: int32
+            X-Expires-After:
+              description: date in UTC when token expires
+              schema:
+                type: string
+                format: date-time
+          content:
+            application/json:
+              schema:
+                type: string
+            application/xml:
+              schema:
+                type: string
+        '400':
+          description: Invalid username/password supplied
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /user/logout:
+    get:
+      tags:
+        - user
+      summary: Logs out current logged in user session
+      operationId: logoutUser
+      responses:
+        default:
+          description: successful operation
+  '/user/{username}':
+    get:
+      tags:
+        - user
+      summary: Get user by user name
+      operationId: getUserByName
+      parameters:
+        - name: username
+          in: path
+          description: The name that needs to be fetched. Use user1 for testing.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid username supplied
+        '404':
+          description: User not found
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    put:
+      tags:
+        - user
+      summary: Updated user
+      description: This can only be done by the logged in user.
+      operationId: updateUser
+      parameters:
+        - name: username
+          in: path
+          description: name that need to be updated
+          required: true
+          schema:
+            type: string
+      responses:
+        '400':
+          description: Invalid user supplied
+        '404':
+          description: User not found
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        description: Updated user object
+        required: true
+    delete:
+      tags:
+        - user
+      summary: Delete user
+      description: This can only be done by the logged in user.
+      operationId: deleteUser
+      parameters:
+        - name: username
+          in: path
+          description: The name that needs to be deleted
+          required: true
+          schema:
+            type: string
+      responses:
+        '400':
+          description: Invalid username supplied
+        '404':
+          description: User not found
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'

@@ -149,4 +149,7 @@ jhipster:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
-# application:
+application:
+  yelpApi:
+    apiKey: 1MGdSyc3DsvVRm1AdZQaMIaxga7NYLTnEPQe7eiifdYyVbNP7U04EGc6-SLvR082FHDloInh8I3QvGYtrs8pQ34yNCUDvEKwMZcDgyWhvIx9mbYqtvUhhqiO4zRBXXYx
+    basePath: https://api.yelp.com/v3
