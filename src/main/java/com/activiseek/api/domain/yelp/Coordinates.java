@@ -1,4 +1,4 @@
-package com.activiseek.api.domain;
+package com.activiseek.api.domain.yelp;
 
 public class Coordinates {
 

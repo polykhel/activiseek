@@ -1,9 +1,11 @@
 package com.activiseek.api.web.rest;
 
+import com.activiseek.api.domain.yelp.Business;
 import com.activiseek.api.service.YelpService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,9 +21,8 @@ public class FeedResource {
         this.yelpService = yelpService;
     }
 
-    @GetMapping("/biz")
-    public String getBusiness() throws Exception {
-        yelpService.getBusiness();
-        return "hello";
+    @GetMapping("/biz/{businessId}")
+    public Business getBusiness(@PathVariable String businessId) {
+        return yelpService.getBusiness(businessId);
     }
 }

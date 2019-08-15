@@ -1,6 +1,8 @@
-package com.activiseek.api.domain;
+package com.activiseek.api.domain.yelp;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.List;
 
 public class Business {
 
@@ -13,6 +15,69 @@ public class Business {
     private String phone;
     private String displayPhone;
     private int reviewCount;
+    private List<Category> categories;
+    private float rating;
+    private Location location;
+    private Coordinates coordinates;
+    private List<String> photos;
+    private String price;
+    private Hours hours;
+
+    public List<Category> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(List<Category> categories) {
+        this.categories = categories;
+    }
+
+    public float getRating() {
+        return rating;
+    }
+
+    public void setRating(float rating) {
+        this.rating = rating;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
+    public Coordinates getCoordinates() {
+        return coordinates;
+    }
+
+    public void setCoordinates(Coordinates coordinates) {
+        this.coordinates = coordinates;
+    }
+
+    public List<String> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(List<String> photos) {
+        this.photos = photos;
+    }
+
+    public String getPrice() {
+        return price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
+    }
+
+    public Hours getHours() {
+        return hours;
+    }
+
+    public void setHours(Hours hours) {
+        this.hours = hours;
+    }
 
     public String getId() {
         return id;

@@ -1,5 +1,7 @@
 package com.activiseek.api.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -7,6 +9,7 @@ import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
 import org.zalando.problem.ProblemModule;
 import org.zalando.problem.violations.ConstraintViolationProblemModule;
 
@@ -58,4 +61,10 @@ public class JacksonConfiguration {
     ConstraintViolationProblemModule constraintViolationProblemModule() {
         return new ConstraintViolationProblemModule();
     }
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+
 }

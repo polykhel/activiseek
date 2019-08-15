@@ -1,14 +1,16 @@
 package com.activiseek.api.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.activiseek.api.config.ApplicationProperties;
+import com.activiseek.api.domain.yelp.Business;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,27 +19,50 @@ public class YelpService {
     private final Logger log = LoggerFactory.getLogger(YelpService.class);
 
     private ObjectMapper objectMapper;
-    private RestTemplate restTemplate = new RestTemplate();
+    private RestTemplate restTemplate;
 
-    @Value("${application.yelpApi.apiKey}")
+    private HttpHeaders headers;
+    private HttpEntity httpEntityHeaders;
+    private Map<String, String> uriVariables;
     private String apiKey;
-
-    @Value("${application.yelpApi.basePath}")
     private String basePath;
 
-    public YelpService(ObjectMapper objectMapper) {
+    public YelpService(ObjectMapper objectMapper, RestTemplate restTemplate, ApplicationProperties properties) {
         this.objectMapper = objectMapper;
+        this.objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
+
+        this.restTemplate = restTemplate;
+        this.apiKey = properties.getYelpApi().getApiKey();
+        this.basePath = properties.getYelpApi().getBasePath();
+
+        headers = new HttpHeaders();
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON_UTF8));
+        headers.add("Authorization", "Bearer " + apiKey);
+
+        httpEntityHeaders = new HttpEntity(headers);
+        uriVariables = new HashMap<>();
     }
 
-    public void getBusiness() throws Exception {
-        Map<String, String> uriVariables = new HashMap();
-        uriVariables.put("id", "GTrblWr4tWS7laa-N9sEJQ");
-        ResponseEntity<String> response
-            = restTemplate.getForEntity(basePath + "/businesses/{id}", String.class, uriVariables);
+    public Business getBusiness(String businessId) {
+        uriVariables.clear();
+        uriVariables.put("id", businessId);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+            basePath + "/businesses/{id}",
+            HttpMethod.GET,
+            httpEntityHeaders,
+            String.class,
+            uriVariables
+        );
         log.info("Response: " + response);
-        JsonNode jsonNode = objectMapper.readTree(response.getBody());
-        String id = jsonNode.get("id").asText();
-        String alias = jsonNode.get("alias").asText();
-        log.info("id and alias: " + id + ", " + alias);
+        try {
+            Business business = objectMapper.readValue(response.getBody(), Business.class);
+            String id = business.getId();
+            String alias = business.getAlias();
+            log.info("id and alias: " + id + ", " + alias);
+            return business;
+        } catch (Exception ignored) {
+        }
+        return null;
     }
 }
