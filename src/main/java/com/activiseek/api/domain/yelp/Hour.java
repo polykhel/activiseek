@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
-public class Hours {
+public class Hour {
     private List<OpeningHours> open;
     private String hoursType;
     private boolean isOpenNow;

@@ -1,5 +1,7 @@
 package com.activiseek.api.domain.yelp;
 
+import java.util.List;
+
 public class Location {
 
     private String address1;
@@ -9,7 +11,7 @@ public class Location {
     private String zipCode;
     private String country;
     private String state;
-    private String displayAddress;
+    private List<String> displayAddress;
     private String crossStreets;
 
     public String getAddress1() {
@@ -68,11 +70,11 @@ public class Location {
         this.state = state;
     }
 
-    public String getDisplayAddress() {
+    public List<String> getDisplayAddress() {
         return displayAddress;
     }
 
-    public void setDisplayAddress(String displayAddress) {
+    public void setDisplayAddress(List<String> displayAddress) {
         this.displayAddress = displayAddress;
     }
 

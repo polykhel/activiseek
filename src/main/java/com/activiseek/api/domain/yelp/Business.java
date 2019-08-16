@@ -21,7 +21,7 @@ public class Business {
     private Coordinates coordinates;
     private List<String> photos;
     private String price;
-    private Hours hours;
+    private List<Hour> hours;
 
     public List<Category> getCategories() {
         return categories;
@@ -71,11 +71,11 @@ public class Business {
         this.price = price;
     }
 
-    public Hours getHours() {
+    public List<Hour> getHours() {
         return hours;
     }
 
-    public void setHours(Hours hours) {
+    public void setHours(List<Hour> hours) {
         this.hours = hours;
     }
 

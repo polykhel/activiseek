@@ -61,7 +61,8 @@ public class YelpService {
             String alias = business.getAlias();
             log.info("id and alias: " + id + ", " + alias);
             return business;
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
     }
