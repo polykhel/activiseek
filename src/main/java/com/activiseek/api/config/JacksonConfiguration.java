@@ -9,9 +9,14 @@ import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 import org.zalando.problem.ProblemModule;
 import org.zalando.problem.violations.ConstraintViolationProblemModule;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Configuration
 public class JacksonConfiguration {
@@ -62,9 +67,34 @@ public class JacksonConfiguration {
         return new ConstraintViolationProblemModule();
     }
 
+    /**
+     * Bean to make jackson automatically convert from
+     * camelCase (java) to under_scores (json) in property names
+     *
+     * @return ObjectMapper that maps from Java camelCase to json under_score names
+     */
+    @Bean
+    public ObjectMapper jacksonObjectMapper()
+    {
+        return new ObjectMapper().setPropertyNamingStrategy(propertyNamingStrategy());
+    }
+
+    @Bean
+    public PropertyNamingStrategy propertyNamingStrategy()
+    {
+        return new PropertyNamingStrategy.SnakeCaseStrategy();
+    }
+
     @Bean
     public RestTemplate restTemplate() {
-        return new RestTemplate();
+        RestTemplate restTemplate = new RestTemplate();
+        List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
+        MappingJackson2HttpMessageConverter jsonMessageConverter = new MappingJackson2HttpMessageConverter();
+        jsonMessageConverter.setObjectMapper(jacksonObjectMapper());
+        messageConverters.add(jsonMessageConverter);
+        restTemplate.setMessageConverters(messageConverters);
+
+        return restTemplate;
     }
 
 }

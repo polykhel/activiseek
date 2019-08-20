@@ -1,9 +1,11 @@
 package com.activiseek.api.domain.yelp;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Business {
 
     private String id;

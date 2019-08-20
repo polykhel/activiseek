@@ -2,8 +2,8 @@ package com.activiseek.api.service;
 
 import com.activiseek.api.config.ApplicationProperties;
 import com.activiseek.api.domain.yelp.Business;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.activiseek.api.domain.yelp.BusinessList;
+import com.activiseek.api.domain.yelp.BusinessReviews;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
@@ -18,7 +18,6 @@ import java.util.Map;
 public class YelpService {
     private final Logger log = LoggerFactory.getLogger(YelpService.class);
 
-    private ObjectMapper objectMapper;
     private RestTemplate restTemplate;
 
     private HttpHeaders headers;
@@ -27,10 +26,7 @@ public class YelpService {
     private String apiKey;
     private String basePath;
 
-    public YelpService(ObjectMapper objectMapper, RestTemplate restTemplate, ApplicationProperties properties) {
-        this.objectMapper = objectMapper;
-        this.objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
-
+    public YelpService(RestTemplate restTemplate, ApplicationProperties properties) {
         this.restTemplate = restTemplate;
         this.apiKey = properties.getYelpApi().getApiKey();
         this.basePath = properties.getYelpApi().getBasePath();
@@ -47,23 +43,66 @@ public class YelpService {
         uriVariables.clear();
         uriVariables.put("id", businessId);
 
-        ResponseEntity<String> response = restTemplate.exchange(
+        ResponseEntity<Business> response = restTemplate.exchange(
             basePath + "/businesses/{id}",
             HttpMethod.GET,
             httpEntityHeaders,
-            String.class,
+            Business.class,
             uriVariables
         );
-        log.info("Response: " + response);
-        try {
-            Business business = objectMapper.readValue(response.getBody(), Business.class);
-            String id = business.getId();
-            String alias = business.getAlias();
-            log.info("id and alias: " + id + ", " + alias);
-            return business;
-        } catch (Exception e) {
-            e.printStackTrace();
+        log.debug("Response: " + response);
+        return response.getBody();
+    }
+
+    public BusinessList searchBusiness(Map<String, String> parameters) {
+        StringBuilder url = new StringBuilder(basePath + "/businesses/search?limit=50");
+
+        for (Map.Entry<String,String> queryParams: parameters.entrySet()) {
+            switch (queryParams.getKey()) {
+                case "term":
+                    url.append("&term=").append(queryParams.getValue());
+                    break;
+                case "location":
+                    url.append("&location=").append(queryParams.getValue());
+                    break;
+                case "latitude":
+                    url.append("&latitude=").append(queryParams.getValue());
+                case "longitude":
+                    url.append("&longitude=").append(queryParams.getValue());
+                    break;
+                case "categories":
+                    url.append("&categories=").append(queryParams.getValue());
+                    break;
+                case "price":
+                    url.append("&price=").append(queryParams.getValue());
+                    break;
+                case "attributes":
+                    url.append("&attributes=").append(queryParams.getValue());
+                    break;
+            }
         }
-        return null;
+
+        ResponseEntity<BusinessList> response = restTemplate.exchange(
+            url.toString(),
+            HttpMethod.GET,
+            httpEntityHeaders,
+            BusinessList.class
+        );
+        log.info("Response: " + response);
+        return response.getBody();
+    }
+
+    public BusinessReviews getBusinessReviews(String businessId) {
+        uriVariables.clear();
+        uriVariables.put("id", businessId);
+
+        ResponseEntity<BusinessReviews> response = restTemplate.exchange(
+            basePath + "/businesses/{id}/reviews",
+            HttpMethod.GET,
+            httpEntityHeaders,
+            BusinessReviews.class,
+            uriVariables
+        );
+        return response.getBody();
     }
 }
