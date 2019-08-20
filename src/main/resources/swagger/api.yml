@@ -285,6 +285,56 @@ paths:
         - feed
       summary: Refresh the feed
       operationId: getFeed
+      parameters:
+        - in: query
+          name: term
+          required: false
+          description: Search term
+          example: food
+          schema:
+            type: string
+        - in: query
+          name: location
+          required: false
+          description: Geographic area. Required if latitude and longitude is not provided
+          example: Manila
+          schema:
+            type: string
+        - in: query
+          name: latitude
+          required: false
+          description: Latitude of the location. Required if location is not provided
+          example: 37.123
+          schema:
+            type: string
+        - in: query
+          name: longitude
+          required: false
+          description: Longitude of the location. Required if longitude is not provided
+          example: -122.523
+          schema:
+            type: string
+        - in: query
+          name: categories
+          required: false
+          description: Categories to filter the results
+          example: korean,bbq
+          schema:
+            type: string
+        - in: query
+          name: price
+          required: false
+          description: Pricing levels to filter the results
+          example: 1,2
+          schema:
+            type: string
+        - in: query
+          name: attributes
+          required: false
+          description: Additional filters
+          example: hot_and_new
+          schema:
+            type: string
       responses:
         '200':
           description: Feed successfully retrieved
