@@ -8,6 +8,13 @@ public class OpeningHours {
     private String end;
     private int day;
 
+    public OpeningHours(boolean isOvernight, String start, String end, int day) {
+        this.isOvernight = isOvernight;
+        this.start = start;
+        this.end = end;
+        this.day = day;
+    }
+
     @JsonProperty("is_overnight")
     public boolean isOvernight() {
         return isOvernight;

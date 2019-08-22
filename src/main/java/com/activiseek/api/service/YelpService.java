@@ -13,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class YelpService {
@@ -54,33 +55,11 @@ public class YelpService {
         return response.getBody();
     }
 
-    public BusinessList searchBusiness(Map<String, String> parameters) {
-        StringBuilder url = new StringBuilder(basePath + "/businesses/search?limit=50");
-
-        for (Map.Entry<String,String> queryParams: parameters.entrySet()) {
-            switch (queryParams.getKey()) {
-                case "term":
-                    url.append("&term=").append(queryParams.getValue());
-                    break;
-                case "location":
-                    url.append("&location=").append(queryParams.getValue());
-                    break;
-                case "latitude":
-                    url.append("&latitude=").append(queryParams.getValue());
-                case "longitude":
-                    url.append("&longitude=").append(queryParams.getValue());
-                    break;
-                case "categories":
-                    url.append("&categories=").append(queryParams.getValue());
-                    break;
-                case "price":
-                    url.append("&price=").append(queryParams.getValue());
-                    break;
-                case "attributes":
-                    url.append("&attributes=").append(queryParams.getValue());
-                    break;
-            }
-        }
+    public BusinessList searchBusiness(Map<String, Optional<String>> parameters) {
+        StringBuilder url = new StringBuilder(basePath + "/businesses/search?");
+        parameters.forEach((key,value) -> {
+            value.ifPresent(v -> url.append("&").append(key).append("=").append(v));
+        });
 
         ResponseEntity<BusinessList> response = restTemplate.exchange(
             url.toString(),

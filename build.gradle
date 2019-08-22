@@ -263,6 +263,7 @@ dependencies {
     }
     implementation "io.springfox:springfox-bean-validators"
     implementation "mysql:mysql-connector-java"
+    implementation "org.springframework.integration:spring-integration-core"
     liquibaseRuntime "mysql:mysql-connector-java"
     implementation "org.mapstruct:mapstruct:${mapstruct_version}"
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstruct_version}"
@@ -296,7 +297,7 @@ task cleanResources(type: Delete) {
 }
 
 wrapper {
-    gradleVersion = "5.4.1"
+    gradleVersion = "5.6"
 }
 compileJava.dependsOn processResources
 processResources.dependsOn bootBuildInfo

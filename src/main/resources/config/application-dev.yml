@@ -124,3 +124,7 @@ jhipster:
 # ===================================================================
 
 # application:
+
+openapi:
+  activiseek:
+    basePath: /api/v1

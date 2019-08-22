@@ -24,6 +24,7 @@ public class Business {
     private List<String> photos;
     private String price;
     private List<Hour> hours;
+    private List<String> transactions;
 
     public List<Category> getCategories() {
         return categories;
@@ -152,5 +153,13 @@ public class Business {
 
     public void setReviewCount(int reviewCount) {
         this.reviewCount = reviewCount;
+    }
+
+    public List<String> getTransactions() {
+        return transactions;
+    }
+
+    public void setTransactions(List<String> transactions) {
+        this.transactions = transactions;
     }
 }
