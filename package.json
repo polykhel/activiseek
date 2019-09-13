@@ -12,7 +12,7 @@
     "generator-jhipster-audit-helper": "1.0.3",
     "generator-jhipster-administration-database": "1.0.4",
     "generator-jhipster-obfuscation-at-rest": "0.3.0",
-    "generator-jhipster": "6.1.2"
+    "generator-jhipster": "6.3.0"
   },
   "engines": {
     "node": ">=8.9.0"
